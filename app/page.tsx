@@ -1,242 +1,204 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
+import { createClient } from "@supabase/supabase-js";
+
+const supabase = createClient(
+  "https://xdvmwyvoeziirciullif.supabase.co",
+  "sb_publishable_cH5UHB8T9HDmasfg87Qczg_usZslQQL"
+);
+
+const questions = [
+  { text: "Does your child follow simple spoken instructions without gestures (for example: 'Give the cup to mom')?", domain: "receptive", reverse: false },
+  { text: "Does your child understand common daily words such as eat, shoes, big, or red?", domain: "receptive", reverse: false },
+  { text: "Does your child understand concepts such as big/small, more/less, or fast/slow?", domain: "receptive", reverse: false },
+  { text: "Does your child understand location words such as on, under, or behind?", domain: "receptive", reverse: false },
+  { text: "Does your child understand simple stories (for example predicting what might happen next or noticing when something unexpected happens)?", domain: "receptive", reverse: false },
+  { text: "Does your child recognize common categories such as fruits, animals, or vehicles?", domain: "receptive", reverse: false },
+  { text: "Does your child understand question words such as who, what, or where?", domain: "receptive", reverse: false },
+  { text: "Does a noisy environment make it harder for your child to understand spoken language?", domain: "receptive", reverse: true },
+
+  { text: "Does your child use many different spoken words to communicate?", domain: "expressive", reverse: false },
+  { text: "Does your child combine two words together (for example 'mom hug' or 'more milk')?", domain: "expressive", reverse: false },
+  { text: "Does your child express needs or wants using words?", domain: "expressive", reverse: false },
+  { text: "Can unfamiliar listeners (for example grandparents or teachers) usually understand what your child says?", domain: "expressive", reverse: false },
+  { text: "Does your child initiate communication with others?", domain: "expressive", reverse: false },
+  { text: "Does your child imitate adult speech or intonation patterns?", domain: "expressive", reverse: false },
+  { text: "Does your child use short phrases or sentences when speaking?", domain: "expressive", reverse: false },
+  { text: "Does your child use pronouns appropriately for your language (for example I, me, you)?", domain: "expressive", reverse: false },
+  { text: "Does your child talk about events that happened earlier in the day?", domain: "expressive", reverse: false },
+  { text: "Compared with children of the same age, do you feel your child’s language is developing typically?", domain: "expressive", reverse: false },
+
+  { text: "Does your child use language to start interactions with others?", domain: "social", reverse: false },
+  { text: "Does your child share attention with you during interaction (for example looking at the same object and checking if you are also looking)?", domain: "social", reverse: false },
+  { text: "Does your child take turns during play or conversation?", domain: "social", reverse: false },
+  { text: "Does your child understand and use gestures such as pointing, waving, or nodding?", domain: "social", reverse: false },
+  { text: "Does your child engage in simple back-and-forth conversation?", domain: "social", reverse: false },
+  { text: "Does your child adjust their communication style, tone, or volume depending on the situation?", domain: "social", reverse: false },
+  { text: "Does your child usually respond when spoken to?", domain: "social", reverse: false },
+  { text: "Does your child frequently repeat words or phrases from TV or from other people?", domain: "social", reverse: true },
+  { text: "Does your child use toys in expected ways (for example feeding a doll, pushing a toy car, or pretending with toys)?", domain: "social", reverse: false },
+  { text: "Does your child follow your pointing or bring objects to show you something interesting?", domain: "social", reverse: false },
+
+  { text: "Can unfamiliar listeners understand a large portion of your child’s speech?", domain: "speech", reverse: false },
+  { text: "Does your child often replace one sound with another (for example saying 'tar' instead of 'car')?", domain: "speech", reverse: true },
+  { text: "Does your child leave out sounds in words (for example 'fi' instead of 'fish')?", domain: "speech", reverse: true },
+  { text: "Does your child have difficulty saying longer or more complex words?", domain: "speech", reverse: true },
+  { text: "Does your child’s speech sometimes appear effortful or accompanied by unusual mouth movements?", domain: "speech", reverse: true, flag: "oral_motor" },
+  { text: "Does your child produce a variety of speech sounds when talking or babbling?", domain: "speech", reverse: false },
+  { text: "Does your child respond consistently when their name is called?", domain: "social", reverse: false, flag: "no_response_name" },
+  { text: "Does your child show frustration when others cannot understand what they are saying?", domain: "speech", reverse: true }
+];
+
+const strategies: any = {
+  receptive: ["Give one instruction at a time", "Use clear and consistent language", "Reduce background noise when possible"],
+  expressive: ["Expand your child’s speech", "Model short and clear sentences", "Encourage verbal requests"],
+  social: ["Practice turn-taking", "Use interactive play", "Model social communication"],
+  speech: ["Model clear pronunciation", "Slow down your speech", "Repeat correct forms naturally"]
+};
 
 export default function Page() {
-  const [config, setConfig] = useState<any>(null);
   const [accepted, setAccepted] = useState(false);
-
   const [current, setCurrent] = useState(0);
   const [answers, setAnswers] = useState<number[]>([]);
-  const [meta, setMeta] = useState<any[]>([]);
   const [selected, setSelected] = useState<number | null>(null);
   const [rawSelected, setRawSelected] = useState<number | null>(null);
-
   const [result, setResult] = useState<any>(null);
-  const [records, setRecords] = useState<any[]>([]);
-  const [engagement, setEngagement] = useState(0);
+  const [saving, setSaving] = useState(false);
 
-  useEffect(() => {
-    const cfg = localStorage.getItem("config");
-    const rec = localStorage.getItem("records");
-    const eng = localStorage.getItem("engagement");
-
-    if (cfg) setConfig(JSON.parse(cfg));
-    if (rec) setRecords(JSON.parse(rec));
-    if (eng) setEngagement(JSON.parse(eng));
-  }, []);
-
-  if (!config) {
-    return <div style={{ padding: 40 }}>Go to /admin and Save first</div>;
-  }
-
-  // ===== DISCLAIMER =====
   if (!accepted) {
     return (
       <div style={{ padding: 40, maxWidth: 800 }}>
         <h1>Important Information</h1>
-
-        <p>
-          This tool is a developmental screening and guidance system.
-          It is NOT a medical or clinical service.
-        </p>
-
+        <p>This tool is a developmental screening and parent guidance system. It is NOT a medical or clinical service.</p>
         <ul>
-          <li>NOT diagnosis</li>
-          <li>NOT therapy</li>
-          <li>NOT replacement for SLP</li>
+          <li>It does NOT provide diagnosis.</li>
+          <li>It does NOT provide speech or language therapy.</li>
+          <li>It does NOT replace a licensed Speech-Language Pathologist.</li>
         </ul>
-
-        <p>
-          If concerned, please consult a licensed professional.
-        </p>
-
-        <button onClick={() => setAccepted(true)}>
-          I Understand and Continue
-        </button>
+        <button onClick={() => setAccepted(true)}>I Understand and Continue</button>
       </div>
     );
   }
 
-  // ===== LOGIC =====
   const handleAnswer = (score: number) => {
-    const q = config.questions[current];
+    const q: any = questions[current];
     const final = q.reverse ? 2 - score : score;
-
     setSelected(final);
     setRawSelected(score);
-
-    const newMeta = [...meta];
-    newMeta[current] = q.flag || null;
-    setMeta(newMeta);
   };
 
-  const applyRedFlags = (answers: number[], meta: any[], base: string) => {
-    let level = base;
+  const calculateDomains = (ans: number[]) => {
+    const map: any = { receptive: [], expressive: [], social: [], speech: [] };
+    questions.forEach((q: any, i) => map[q.domain].push(ans[i]));
 
-    meta.forEach((flag, i) => {
-      const score = answers[i];
-
-      if (flag === "no_response_name" && score === 0) {
-        level = "Moderate Risk";
-      }
-
-      if (flag === "oral_motor" && score === 2) {
-        level = "Moderate Risk";
-      }
+    const out: any = {};
+    Object.keys(map).forEach((d) => {
+      const avg = map[d].reduce((a: number, b: number) => a + b, 0) / map[d].length;
+      out[d] = avg >= 1.5 ? "Strong" : avg >= 1 ? "Mild Concern" : "At Risk";
     });
+    return out;
+  };
 
+  const applyRedFlags = (ans: number[], base: string) => {
+    let level = base;
+    questions.forEach((q: any, i) => {
+      if (q.flag === "no_response_name" && ans[i] === 0) level = "Moderate Risk";
+      if (q.flag === "oral_motor" && ans[i] === 2) level = "Moderate Risk";
+    });
     return level;
   };
 
-  const calculateDomains = (answers: number[]) => {
-    const map: any = { receptive: [], expressive: [], social: [], speech: [] };
+  const next = async () => {
+    if (selected === null) return alert("Please select an answer.");
 
-    config.questions.forEach((q: any, i: number) => {
-      map[q.domain].push(answers[i]);
-    });
+    const newAnswers = [...answers];
+    newAnswers[current] = selected;
 
-    const result: any = {};
-
-    Object.keys(map).forEach((d) => {
-      const avg =
-        map[d].reduce((a: number, b: number) => a + b, 0) / map[d].length;
-
-      result[d] =
-        avg >= 1.5 ? "Strong" : avg >= 1 ? "Mild Concern" : "At Risk";
-    });
-
-    return result;
-  };
-
-  const getTrend = (records: any[]) => {
-    if (records.length < 2) return "Not enough data";
-
-    const first = records[0].score;
-    const last = records[records.length - 1].score;
-
-    if (last > first) return "Improving";
-    if (last === first) return "Stable";
-    return "Needs Attention";
-  };
-
-  const next = () => {
-    if (selected === null) return alert("Please select");
-
-    const newAns = [...answers];
-    newAns[current] = selected;
-
-    setAnswers(newAns);
+    setAnswers(newAnswers);
     setSelected(null);
     setRawSelected(null);
 
-    if (current < config.questions.length - 1) {
+    if (current < questions.length - 1) {
       setCurrent(current + 1);
-    } else {
-      const total = newAns.reduce((a, b) => a + b, 0);
-
-      let level =
-        total <= 50
-          ? "High Risk"
-          : total <= 65
-          ? "Moderate Risk"
-          : total <= 75
-          ? "Mild Risk"
-          : "Typical";
-
-      const finalLevel = applyRedFlags(newAns, meta, level);
-      const domains = calculateDomains(newAns);
-
-      const record = {
-        score: total,
-        level: finalLevel,
-        domains,
-        date: new Date().toISOString(),
-      };
-
-      const existing = JSON.parse(localStorage.getItem("records") || "[]");
-      existing.push(record);
-      localStorage.setItem("records", JSON.stringify(existing));
-
-      setRecords(existing);
-      setResult(record);
+      return;
     }
+
+    const score = newAnswers.reduce((a, b) => a + b, 0);
+
+    let level =
+      score <= 50 ? "High Risk" :
+      score <= 65 ? "Moderate Risk" :
+      score <= 75 ? "Mild Risk" :
+      "Typical";
+
+    level = applyRedFlags(newAnswers, level);
+    const domains = calculateDomains(newAnswers);
+
+    const finalResult = { score, level, domains, answers: newAnswers };
+
+    setSaving(true);
+
+    const { error } = await supabase.from("records").insert([
+      {
+        score,
+        level,
+        domains,
+        answers: newAnswers,
+        raw_data: finalResult
+      }
+    ]);
+
+    setSaving(false);
+
+    if (error) {
+      alert("Saved locally, but failed to upload to database. Please tell the admin.");
+      console.error(error);
+    }
+
+    setResult(finalResult);
   };
 
-  const logPractice = () => {
-    const val = engagement + 1;
-    setEngagement(val);
-    localStorage.setItem("engagement", JSON.stringify(val));
-  };
-
-  // ===== RESULT =====
   if (result) {
-    const latest = records[records.length - 1];
-
     return (
       <div style={{ padding: 40 }}>
-        <h1>Result</h1>
-
-        <p>Score: {result.score}</p>
-        <p>Risk: {result.level}</p>
+        <h1>Screening Result</h1>
+        <p><b>Score:</b> {result.score}</p>
+        <p><b>Risk Level:</b> {result.level}</p>
 
         <h3>Important</h3>
-        <p>This is NOT a diagnosis.</p>
+        <p>This result is based on a screening questionnaire and does NOT constitute a clinical diagnosis.</p>
+        <p>If concerns persist, please seek evaluation from a licensed Speech-Language Pathologist.</p>
 
         <h3>Domain Breakdown</h3>
-        {Object.keys(latest.domains).map((d) => (
-          <p key={d}>
-            {d}: {latest.domains[d]}
-          </p>
+        {Object.keys(result.domains).map((d) => (
+          <p key={d}>{d}: {result.domains[d]}</p>
         ))}
 
         <h3>Strategies</h3>
-        {Object.keys(latest.domains).map((d) =>
-          latest.domains[d] !== "Strong" ? (
+        {Object.keys(result.domains).map((d) =>
+          result.domains[d] !== "Strong" ? (
             <div key={d}>
               <b>{d}</b>
               <ul>
-                {config.strategies[d].map((s: string, i: number) => (
-                  <li key={i}>{s}</li>
-                ))}
+                {strategies[d].map((s: string, i: number) => <li key={i}>{s}</li>)}
               </ul>
             </div>
           ) : null
         )}
-
-        <h3>Practice Tracking</h3>
-        <button onClick={logPractice}>+ Practice</button>
-        <p>Total Days: {engagement}</p>
-
-        <h3>Progress</h3>
-        {records.map((r, i) => (
-          <p key={i}>
-            #{i + 1}: {r.score} ({r.level})
-          </p>
-        ))}
-
-        <p>Trend: {getTrend(records)}</p>
-
-        <button onClick={() => window.location.reload()}>
-          Restart
-        </button>
       </div>
     );
   }
 
-  // ===== QUESTION =====
   return (
     <div style={{ padding: 40 }}>
-      <h2>
-        Question {current + 1} / {config.questions.length}
-      </h2>
-
-      <p>{config.questions[current].text}</p>
+      <h2>Question {current + 1} / {questions.length}</h2>
+      <p>{questions[current].text}</p>
 
       {[
         { label: "Yes", v: 2 },
         { label: "Sometimes", v: 1 },
-        { label: "No", v: 0 },
+        { label: "No", v: 0 }
       ].map((opt) => (
         <button
           key={opt.v}
@@ -245,14 +207,16 @@ export default function Page() {
             display: "block",
             margin: "12px 0",
             padding: 12,
-            background: rawSelected === opt.v ? "#ccc" : "#eee",
+            background: rawSelected === opt.v ? "#ccc" : "#eee"
           }}
         >
           {opt.label}
         </button>
       ))}
 
-      <button onClick={next}>Next</button>
+      <button onClick={next} disabled={saving}>
+        {saving ? "Saving..." : "Next"}
+      </button>
     </div>
   );
 }
