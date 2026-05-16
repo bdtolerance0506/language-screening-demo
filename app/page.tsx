@@ -193,6 +193,7 @@ const score = Math.round((rawScore / 72) * 80);
      {
        family_code: code,
        assessment_number: assessmentNumber,
+       age_band: ageBand,
        raw_score: rawScore,
        score,
        level,
@@ -328,6 +329,17 @@ const score = Math.round((rawScore / 72) * 80);
     ? "2–3 years"
     : "4–6 years"}
 </p>
+
+<h3>Age-Adjusted Interpretation</h3>
+{result.age_band === "2-3" ? (
+  <p>
+    For children aged 2–3, some language skills may still be emerging. This result should be interpreted as a guide to areas that may benefit from monitoring, enriched interaction, and supportive practice at home.
+  </p>
+) : (
+  <p>
+    For children aged 4–6, persistent concerns in these areas may be more clinically meaningful. This result may suggest a stronger need for close monitoring and consideration of professional consultation, especially if concerns persist.
+  </p>
+)}
        {result.previous_score !== null ? (
          <div>
            <h3>Progress Compared With Previous Screening</h3>
