@@ -65,7 +65,6 @@ export default function Page() {
  const [accepted, setAccepted] = useState(false);
  const [hasCode, setHasCode] = useState(false);
  const [familyCode, setFamilyCode] = useState("");
- const [ageBand, setAgeBand] = useState("");
 
  const [current, setCurrent] = useState(0);
  const [answers, setAnswers] = useState<number[]>([]);
@@ -76,10 +75,6 @@ export default function Page() {
  const [saving, setSaving] = useState(false);
 
  const startScreening = () => {
-  if (ageBand === "") {
-  alert("Please select your child’s age group.");
-  return;
-}
    if (hasCode && familyCode.trim() === "") {
      alert("Please enter your Family Code.");
      return;
@@ -181,7 +176,6 @@ const score = Math.round((rawScore / 72) * 80);
      assessment_number: assessmentNumber,
      previous_score: previousScore,
      score_change: scoreChange,
-     age_band: ageBand,
      raw_score: rawScore,
      score,
      level,
@@ -273,37 +267,7 @@ const score = Math.round((rawScore / 72) * 80);
 
        <br />
        <br />
-<h3>Child Age Group</h3>
 
-<p>
-  This tool is designed for children aged 2–6.
-  Age group is used to adjust interpretation language,
-  not numeric score.
-</p>
-
-<button
-  onClick={() => setAgeBand("2-3")}
-  style={{
-    marginRight: 10,
-    padding: 10,
-    background: ageBand === "2-3" ? "#ccc" : "#eee"
-  }}
->
-  2–3 years
-</button>
-
-<button
-  onClick={() => setAgeBand("4-6")}
-  style={{
-    padding: 10,
-    background: ageBand === "4-6" ? "#ccc" : "#eee"
-  }}
->
-  4–6 years
-</button>
-
-<br />
-<br />
        <button onClick={startScreening} style={{ padding: 10 }}>
          I Understand and Continue
        </button>
@@ -322,12 +286,7 @@ const score = Math.round((rawScore / 72) * 80);
        <p><b>Raw Score:</b> {result.raw_score} / 72</p>
        <p><b>Scaled Score:</b> {result.score} / 80</p>
        <p><b>Risk Level:</b> {result.level}</p>
-<p>
-  <b>Age Group:</b>{" "}
-  {result.age_band === "2-3"
-    ? "2–3 years"
-    : "4–6 years"}
-</p>
+
        {result.previous_score !== null ? (
          <div>
            <h3>Progress Compared With Previous Screening</h3>
