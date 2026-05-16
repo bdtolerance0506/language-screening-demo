@@ -140,9 +140,7 @@ export default function Page() {
      return;
    }
 
-const rawScore = newAnswers.reduce((a, b) => a + b, 0);
-
-const score = Math.round((rawScore / 72) * 80);
+   const score = newAnswers.reduce((a, b) => a + b, 0);
 
    let level =
      score <= 50 ? "High Risk" :
@@ -176,7 +174,6 @@ const score = Math.round((rawScore / 72) * 80);
      assessment_number: assessmentNumber,
      previous_score: previousScore,
      score_change: scoreChange,
-     raw_score: rawScore,
      score,
      level,
      domains,
@@ -187,7 +184,6 @@ const score = Math.round((rawScore / 72) * 80);
      {
        family_code: code,
        assessment_number: assessmentNumber,
-       raw_score: rawScore,
        score,
        level,
        domains,
@@ -283,8 +279,7 @@ const score = Math.round((rawScore / 72) * 80);
        <p><b>Family Code:</b> {result.family_code}</p>
        <p><b>Assessment #:</b> {result.assessment_number}</p>
 
-       <p><b>Raw Score:</b> {result.raw_score} / 72</p>
-       <p><b>Scaled Score:</b> {result.score} / 80</p>
+       <p><b>Score:</b> {result.score}</p>
        <p><b>Risk Level:</b> {result.level}</p>
 
        {result.previous_score !== null ? (
