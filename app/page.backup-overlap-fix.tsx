@@ -21,7 +21,7 @@ const questions = [
  { text: "Does your child use many different spoken words to communicate?", domain: "expressive", reverse: false },
  { text: "Does your child combine two words together (for example 'mom hug' or 'more milk')?", domain: "expressive", reverse: false },
  { text: "Does your child express needs or wants using words rather than just gestures?", domain: "expressive", reverse: false },
- { text: "Does your child use both labeling words (door, shoe, cookie) and action words (open, help, eat)?", domain: "expressive", reverse: false },
+ { text: "Can unfamiliar listeners (for example grandparents or teachers) usually understand what your child says?", domain: "expressive", reverse: false },
  { text: "Does your child initiate communication with others?", domain: "expressive", reverse: false },
  { text: "Does your child imitate adult speech or intonation patterns?", domain: "expressive", reverse: false },
  { text: "Does your child use short phrases or sentences when speaking rather than just single words?", domain: "expressive", reverse: false },
@@ -39,13 +39,14 @@ const questions = [
  { text: "Does your child frequently repeat words or phrases from TV or from other people?", domain: "social", reverse: true },
  { text: "Does your child use toys in expected ways (for example feeding a doll, pushing a toy car, or pretending with toys)?", domain: "social", reverse: false },
  { text: "Does your child follow your pointing or bring objects to show you something interesting?", domain: "social", reverse: false },
- { text: "Can unfamiliar listeners (for example grandparents or teachers) usually understand what your child says?", domain: "speech", reverse: false },
+
+ { text: "Can unfamiliar listeners understand a large portion of your child’s speech?", domain: "speech", reverse: false },
  { text: "Does your child often replace one sound with another (for example saying 'tar' instead of 'car')?", domain: "speech", reverse: true },
  { text: "Does your child leave out sounds in words (for example 'fi' instead of 'fish')?", domain: "speech", reverse: true },
  { text: "Does your child have difficulty saying longer or more complex words?", domain: "speech", reverse: true },
  { text: "Does your child’s speech sometimes appear effortful or accompanied by unusual mouth movements?", domain: "speech", reverse: true, flag: "oral_motor" },
  { text: "Does your child produce a variety of speech sounds when talking or babbling?", domain: "speech", reverse: false },
- { text: "Does your child say one word in more than one way (for example, 'book' is sometimes 'boot', sometimes 'goot', sometimes 'gook')?", domain: "social", reverse: false, flag: "no_response_name" },
+ { text: "Does your child respond consistently when their name is called?", domain: "social", reverse: false, flag: "no_response_name" },
  { text: "Does your child show frustration when others cannot understand what they are saying?", domain: "speech", reverse: true }
 ];
 
